@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E '\\\\.\\(js|config|rc\\)$')",
+      "Bash(npm install *)",
+      "Bash(node -e \"const p = require\\('./node_modules/nativewind/package.json'\\); console.log\\('nativewind', p.version\\)\")",
+      "Bash(node -e \"const p = require\\('./node_modules/tailwindcss/package.json'\\); console.log\\('tailwindcss', p.version\\)\")",
+      "Bash(git add *)"
+    ]
+  }
+}
