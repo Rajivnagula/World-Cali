@@ -30,10 +30,10 @@ const USER_NAME  = 'Rajiv';
 const STREAK     = 12;
 
 const FESTIVAL = {
-  emoji:    '🪔',
-  name:     'అక్షయ తృతీయ',
-  sub:      'Auspicious for new beginnings · sunset 6:42 PM',
-  dateLabel:'Today',
+  emoji:   '🪔',
+  nameEn:  'Akshaya Tritiya',
+  nameTe:  'అక్షయ తృతీయ',
+  sub:     'Auspicious for new beginnings · sunset 6:42 PM',
 };
 
 function daysUntil(date: Date): number {
@@ -60,18 +60,21 @@ const FEED = [
   {
     id: 1, strip: '#22c55e', iconBg: '#071f0b', icon: '🏏',
     title: 'IPL Playoffs · Today',
+    why: 'You watched the last 3 matches',
     reason: 'Rajasthan Royals vs Mumbai Indians · 7:30 PM IST · D/N match',
     action: 'Set Alert',
   },
   {
     id: 2, strip: '#3b82f6', iconBg: '#071428', icon: '🚀',
     title: 'ISRO Launch Window',
+    why: 'In your science interests',
     reason: 'Chandrayaan-4 orbital insertion burn · 14:22 UTC · Watch ISRO live stream',
     action: 'Watch Live',
   },
   {
     id: 3, strip: '#ec4899', iconBg: '#1a0510', icon: '🪔',
-    title: 'అక్షయ తృతీయ History',
+    title: 'Akshaya Tritiya History',
+    why: 'Your heritage festival',
     reason: '3 family milestones happened on this date across generations.',
     action: 'Explore',
   },
@@ -196,8 +199,11 @@ function HeroFestivalCard() {
 
       {/* Content */}
       <View style={hf.content}>
-        <Text style={hf.dateLabel}>{FESTIVAL.dateLabel}</Text>
-        <Text style={hf.name}>{FESTIVAL.name}</Text>
+        <View style={hf.todayBadge}>
+          <Text style={hf.todayText}>TODAY</Text>
+        </View>
+        <Text style={hf.nameEn}>{FESTIVAL.nameEn}</Text>
+        <Text style={hf.nameTe}>{FESTIVAL.nameTe}</Text>
         <Text style={hf.sub}>{FESTIVAL.sub}</Text>
       </View>
     </View>
@@ -218,12 +224,18 @@ const hf = StyleSheet.create({
     fontSize: 64, opacity: 0.18,
   },
   content: { position: 'absolute', bottom: 18, left: 18 },
-  dateLabel: {
-    color: ORANGE, fontSize: 11, fontWeight: '700',
-    letterSpacing: 1.2, textTransform: 'uppercase', marginBottom: 4,
+  todayBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,140,0,0.18)',
+    borderWidth: 1, borderColor: 'rgba(255,140,0,0.45)',
+    borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2, marginBottom: 8,
   },
-  name: { color: '#ffffff', fontSize: 20, fontWeight: '800', marginBottom: 4 },
-  sub:  { color: 'rgba(255,255,255,0.55)', fontSize: 12 },
+  todayText: {
+    color: ORANGE, fontSize: 10, fontWeight: '800', letterSpacing: 1.4,
+  },
+  nameEn: { color: '#ffffff', fontSize: 20, fontWeight: '800', marginBottom: 2 },
+  nameTe: { color: 'rgba(255,255,255,0.45)', fontSize: 13, marginBottom: 4 },
+  sub:    { color: 'rgba(255,255,255,0.4)', fontSize: 11 },
 });
 
 // ─── 4. Countdown card ────────────────────────────────────────────────────────
@@ -248,33 +260,65 @@ const cc = StyleSheet.create({
   label: { color: 'rgba(255,255,255,0.7)', fontSize: 10, fontWeight: '600', marginTop: 6, textAlign: 'center' },
 });
 
-// ─── 5. Memory card ───────────────────────────────────────────────────────────
+// ─── 5. Memory card (hero) ────────────────────────────────────────────────────
 function MemoryCard() {
+  const opacity = useSharedValue(0);
+  useEffect(() => {
+    opacity.value = withTiming(1, { duration: 1200, easing: Easing.out(Easing.ease) });
+  }, []);
+  const fadeStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+
   return (
-    <View style={mc.card}>
-      <View style={mc.strip} />
-      <View style={mc.body}>
-        <Text style={mc.tag}>✦ MEMORY UNLOCKED</Text>
-        <Text style={mc.title}>{MEMORY.title}</Text>
-        <Text style={mc.text}>{MEMORY.text}</Text>
+    <Animated.View style={[mc.card, fadeStyle]}>
+      {/* Subtle purple glow backdrop */}
+      <View style={mc.glowBlob} />
+
+      {/* Header row */}
+      <View style={mc.header}>
+        <Text style={mc.tag}>✦ MEMORY</Text>
+        <TouchableOpacity
+          style={mc.shareBtn}
+          onPress={() => alert('Generating Instagram card… 📸')}>
+          <Text style={mc.shareText}>Share ↗</Text>
+        </TouchableOpacity>
       </View>
-    </View>
+
+      {/* Content */}
+      <Text style={mc.title}>{MEMORY.title}</Text>
+      <Text style={mc.text}>{MEMORY.text}</Text>
+    </Animated.View>
   );
 }
 const mc = StyleSheet.create({
   card: {
-    flexDirection: 'row', backgroundColor: MEM_BG, borderRadius: 16,
-    marginBottom: 20, overflow: 'hidden',
-    borderWidth: 1, borderColor: 'rgba(168,85,247,0.2)',
+    backgroundColor: MEM_BG, borderRadius: 20, padding: 20,
+    minHeight: 120, marginBottom: 20, overflow: 'hidden',
+    borderWidth: 1, borderColor: 'rgba(168,85,247,0.25)',
   },
-  strip: { width: 4, backgroundColor: '#a855f7' },
-  body:  { flex: 1, padding: 16 },
-  tag:   {
-    color: '#a855f7', fontSize: 9, fontWeight: '800',
-    letterSpacing: 1.4, textTransform: 'uppercase', marginBottom: 6,
+  glowBlob: {
+    position: 'absolute', width: 180, height: 180, borderRadius: 90,
+    backgroundColor: 'rgba(168,85,247,0.07)',
+    top: -60, right: -40,
   },
-  title: { color: '#ffffff', fontSize: 15, fontWeight: '700', marginBottom: 4 },
-  text:  { color: 'rgba(255,255,255,0.55)', fontSize: 13, lineHeight: 19 },
+  header: {
+    flexDirection: 'row', justifyContent: 'space-between',
+    alignItems: 'center', marginBottom: 12,
+  },
+  tag: {
+    color: '#c084fc', fontSize: 10, fontWeight: '800',
+    letterSpacing: 1.6, textTransform: 'uppercase',
+    textShadowColor: 'rgba(192,132,252,0.9)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
+  },
+  shareBtn: {
+    backgroundColor: 'rgba(168,85,247,0.12)',
+    borderWidth: 1, borderColor: 'rgba(168,85,247,0.35)',
+    borderRadius: 10, paddingHorizontal: 12, paddingVertical: 5,
+  },
+  shareText: { color: '#c084fc', fontSize: 12, fontWeight: '700' },
+  title: { color: '#ffffff', fontSize: 17, fontWeight: '800', marginBottom: 6, lineHeight: 22 },
+  text:  { color: 'rgba(255,255,255,0.52)', fontSize: 13, lineHeight: 20 },
 });
 
 // ─── 6. Feed card ─────────────────────────────────────────────────────────────
@@ -285,6 +329,7 @@ function FeedCard({ item }: { item: typeof FEED[number] }) {
         <Text style={fc.icon}>{item.icon}</Text>
       </View>
       <View style={fc.body}>
+        <Text style={fc.why}>✦ {item.why}</Text>
         <Text style={fc.title}>{item.title}</Text>
         <Text style={fc.reason}>{item.reason}</Text>
         <TouchableOpacity style={[fc.btn, { borderColor: item.strip + 'aa' }]}>
@@ -307,6 +352,7 @@ const fc = StyleSheet.create({
   },
   icon:    { fontSize: 22 },
   body:    { flex: 1 },
+  why:     { color: 'rgba(255,255,255,0.28)', fontSize: 10, fontWeight: '600', letterSpacing: 0.6, marginBottom: 3 },
   title:   { color: '#ffffff', fontSize: 14, fontWeight: '700', marginBottom: 3 },
   reason:  { color: 'rgba(255,255,255,0.45)', fontSize: 12, lineHeight: 18, marginBottom: 10 },
   btn:     {
@@ -317,7 +363,31 @@ const fc = StyleSheet.create({
   btnText: { fontSize: 12, fontWeight: '700' },
 });
 
-// ─── 7. Cali FAB ─────────────────────────────────────────────────────────────
+// ─── 7. Life insight card ────────────────────────────────────────────────────
+function LifeInsightCard() {
+  return (
+    <View style={li.card}>
+      <Text style={li.label}>✦ LIFE INSIGHT</Text>
+      <Text style={li.text}>
+        You've been consistent this week — 7 days straight 🔥
+      </Text>
+    </View>
+  );
+}
+const li = StyleSheet.create({
+  card: {
+    backgroundColor: '#0a0f06', borderRadius: 16, padding: 18, marginBottom: 10,
+    borderWidth: 1, borderColor: 'rgba(34,197,94,0.2)',
+    borderLeftWidth: 3, borderLeftColor: '#22c55e',
+  },
+  label: {
+    color: '#4ade80', fontSize: 10, fontWeight: '800',
+    letterSpacing: 1.4, textTransform: 'uppercase', marginBottom: 6,
+  },
+  text: { color: 'rgba(255,255,255,0.75)', fontSize: 14, fontWeight: '600', lineHeight: 20 },
+});
+
+// ─── 8. Cali FAB ─────────────────────────────────────────────────────────────
 function CaliFab() {
   const floatY = useSharedValue(0);
   const glow   = useSharedValue(0.4);
@@ -399,9 +469,10 @@ export default function CalendarScreen() {
         {/* 5 · Memory card */}
         <MemoryCard />
 
-        {/* 6 · Smart feed */}
-        <Text style={s.sectionLabel}>Today's Feed</Text>
+        {/* 6 · Life feed */}
+        <Text style={s.sectionLabel}>Life Feed</Text>
         {FEED.map(item => <FeedCard key={item.id} item={item} />)}
+        <LifeInsightCard />
 
         <View style={{ height: 110 }} />
       </ScrollView>
